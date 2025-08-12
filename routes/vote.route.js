@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { vote, myVotes } from '../controllers/vote.controller.js';
+import { vote, myVotes } from '../Controllers/vote.controller.js';
 import { auth } from '../middleware/auth.js';
 
 const router = Router();
