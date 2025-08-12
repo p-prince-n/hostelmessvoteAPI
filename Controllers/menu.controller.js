@@ -40,7 +40,7 @@ export const topMenuItems = async (req, res) => {
 
 export const getAllMenuItems = async (req, res) => {
   try {
-    const items = await MenuItem.find({}, { name: 1, _id: 0 }).sort({ name: 1 }); 
+    const items = await MenuItem.find({}, { name: 1, _id: 1 }).sort({ name: 1 }); 
     if(items.length<=0) return res.status(404).json({ message: 'Currently items doesn\'t exist.' });
     
 

@@ -1,6 +1,6 @@
 import Vote from '../models/vote.model.js';
 import MenuItem from '../models/menueItems.model.js';
-import mongoose from 'mongoose';
+
 
 const getTodayString = () => {
   const d = new Date();
@@ -14,14 +14,23 @@ export const vote = async (req, res) => {
   try {
     const studentId = req.user._id;
     const { menuItemId } = req.body;
-    if (!menuItemId) return res.status(400).json({ message: 'menuItemId required' });
+
+    if (!menuItemId) {
+      return res.status(400).json({ message: 'menuItemId required' });
+    }
 
     const menu = await MenuItem.findById(menuItemId);
-    if (!menu) return res.status(404).json({ message: 'Menu item not found' });
+    if (!menu) {
+      return res.status(404).json({ message: 'Menu item not found' });
+    }
 
     const voteDate = getTodayString();
 
-    const newVote = new Vote({ student: studentId, menuItem: mongoose.Types.ObjectId(menuItemId), voteDate });
+    const newVote = new Vote({
+      student: studentId,
+      menuItem: menuItemId, // Let Mongoose cast
+      voteDate
+    });
 
     try {
       const saved = await newVote.save();
@@ -36,6 +45,7 @@ export const vote = async (req, res) => {
     res.status(500).json({ message: 'Voting failed', error: err.message });
   }
 };
+
 
 export const myVotes = async (req, res) => {
   try {
