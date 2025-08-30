@@ -25,17 +25,70 @@ app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/vote', voteRoutes);
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    "/": "List all available API endpoints",
-    "/api/users/register": "Register a new user (default student, admin must be set manually in DB)",
-    "/api/users/login": "Login and get JWT stored in cookie",
-    "/api/menu/getAllItems": "List all approved menu items (names only)",
-    "/api/menu/top?limit=3": "Get top voted menu items (limit default 3)",
-    "/api/menu/vote/:id": "Vote for a menu item (once per day per student)",
-    "/api/menu/add": "Add new menu item (admin only)"
+app.get("/", (req, res) => {
+  const routes = [
+    // ---- AUTH ROUTES ----
+    {
+      path: "/api/auth/register",
+      method: "POST",
+      requiredFields: ["rollNo", "name", "password"],
+      description: "Register a new user (stores JWT in HttpOnly cookie)."
+    },
+    {
+      path: "/api/auth/login",
+      method: "POST",
+      requiredFields: ["rollNo", "password"],
+      description: "Login user and set JWT in HttpOnly cookie."
+    },
+    {
+      path: "/api/auth/logout",
+      method: "POST",
+      requiredFields: [],
+      description: "Logout user by clearing JWT cookie."
+    },
+
+    // ---- MENU ROUTES ----
+    {
+      path: "/api/menu/top",
+      method: "GET",
+      requiredFields: ["JWT cookie (HttpOnly)"],
+      description: "Fetch top voted menu items (default limit = 3, can pass ?limit=number)."
+    },
+    {
+      path: "/api/menu",
+      method: "POST",
+      requiredFields: ["name", "description", "JWT cookie (admin only)"],
+      description: "Create a new menu item (admin only)."
+    },
+    {
+      path: "/api/menu/getAllItems",
+      method: "GET",
+      requiredFields: [],
+      description: "Fetch all available menu items (returns id and name)."
+    },
+
+    // ---- VOTE ROUTES ----
+    {
+      path: "/api/vote",
+      method: "POST",
+      requiredFields: ["menuItemId", "voteDate", "JWT cookie"],
+      description: "Submit a vote for a menu item."
+    },
+    {
+      path: "/api/vote",
+      method: "GET",
+      requiredFields: ["JWT cookie (optional, depending on implementation)"],
+      description: "Get all votes or filter by query params."
+    }
+  ];
+
+  res.json({
+    message: "API Routes Documentation (JWT stored in HttpOnly cookies)",
+    routes
   });
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
